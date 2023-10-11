@@ -26,10 +26,10 @@ class XverifyAPIClient {
         $this->client = new Client(array_merge($defaultConfig, $configOptions));
     }
 
-      public function verifyEmail(string $email = '', array $options = []): array {
-            $response = $this->makeRequest(endpoint: 'ev', params: ['email' => $email] + $options);
-            return $this->formatResponse(response: $response);
-        }
+    public function verifyEmail(string $email = '', array $options = []): array {
+        $response = $this->makeRequest(endpoint: 'ev', params: ['email' => $email] + $options);
+        return $this->formatResponse(response: $response);
+    }
 
     public function verifyPhone(string $phone = '', array $options = []): array {
         $response = $this->makeRequest(endpoint: 'pv', params: ['phone' => $phone] + $options);
@@ -56,13 +56,13 @@ class XverifyAPIClient {
         ]);
 
         try {
-            $response = $this->client->get(uri: $endpoint, options: ['query' => $params, 'http_errors' => false]); // Add 'http_errors' => false
+            $response = $this->client->get(uri: $endpoint, options: ['query' => $params, 'http_errors' => false]); // Keeping 'http_errors' => false
 
             $statusCode = $response->getStatusCode();
 
-            if ($statusCode >= 400) { 
+            if ($statusCode >= 400) {
                 return [
-                    'error' => $response->getReasonPhrase(),
+                    'error' => $this->getStatusMessage($statusCode),  // Use our custom status messages
                     'statusCode' => $statusCode
                 ];
             }
@@ -75,34 +75,25 @@ class XverifyAPIClient {
         }
     }
 
-
     private function handleConnectException(ConnectException $exception): array {
         return ['error' => 'Connection timeout or network issue.', 'statusCode' => 0];
     }
 
-private function handleRequestException(RequestException $exception): array {
-    if ($exception->hasResponse()) {
-        $response = $exception->getResponse();
-        $statusCode = $response->getStatusCode();
-        $reason = $response->getReasonPhrase();
+    private function handleRequestException(RequestException $exception): array {
+        if ($exception->hasResponse()) {
+            $response = $exception->getResponse();
+            $statusCode = $response->getStatusCode();
+            $reason = $response->getReasonPhrase();
+            
+            return [
+                'error' => $reason,
+                'statusCode' => $statusCode
+            ];
+        }
         
-        return [
-            'error' => $reason,
-            'statusCode' => $statusCode
-        ];
+        // If no response is available, return a generic error
+        return ['error' => 'Unknown error', 'statusCode' => 0];
     }
-    
-    // If no response is available, return a generic error
-    return ['error' => 'Unknown error', 'statusCode' => 0];
-}
-
-
-
-
-
-
-
-
 
     // recursively filter out any empty fields from the response (or any nested arrays)
     private function filterEmptyFields(array $data): array {
@@ -117,19 +108,18 @@ private function handleRequestException(RequestException $exception): array {
         return $data;
     }
 
-private function formatResponse(array $response): array {
-    if (isset($response['data'])) {
-        $decodedData = $response['data'];
-        return is_array($decodedData) ? $decodedData : [];
-    } elseif (isset($response['error'])) {
-        return [
-            'error' => $response['error'],
-            'statusCode' => $response['statusCode']
-        ];
+    private function formatResponse(array $response): array {
+        if (isset($response['data'])) {
+            $decodedData = $response['data'];
+            return is_array($decodedData) ? $decodedData : [];
+        } elseif (isset($response['error'])) {
+            return [
+                'error' => $response['error'],
+                'statusCode' => $response['statusCode']
+            ];
+        }
+        return ['error' => 'Unknown error', 'statusCode' => 0];
     }
-    return ['error' => 'Unknown error', 'statusCode' => 0];
-}
-
 
     // return a status message based on the http status code
     private function getStatusMessage(int $statusCode): string {
