@@ -1,0 +1,20 @@
+{
+    "name": "muncherelli/xverify-api-client",
+    "description": "Xverify API (v2) Client for PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Muncherelli\\XverifyAPIClient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "muncherelli",
+            "email": "16467105+muncherelli@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.8"
+    }
+}
