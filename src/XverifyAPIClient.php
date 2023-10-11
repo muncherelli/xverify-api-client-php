@@ -125,11 +125,11 @@ class XverifyAPIClient {
     private function getStatusMessage(int $statusCode): string {
         $messages = [
             200 => 'API OK',
-            400 => 'A parameter was missing or has an invalid value',
-            401 => 'Unauthorized. Either the apiKey was missing or invalid, or you are trying to use a service you are not configured for.',
-            403 => 'Forbidden. Your query limit has been exceeded.',
-            500 => 'Internal server error. Please contact support.',
-            502 => 'Bad gateway. The API is not available. Please try again later or contact support.'
+            400 => 'An Xverify parameter was missing or has an invalid value',
+            401 => 'Unauthorized. Either the Xverify apiKey was missing or invalid, or you are trying to use a service you are not configured for.',
+            403 => 'Forbidden. Your Xverify query limit has been exceeded.',
+            500 => 'Internal server error. Please contact Xverify support.',
+            502 => 'Bad gateway. The Xverify API is not available. Please try again later or contact Xverify support.'
         ];
 
         return $messages[$statusCode] ?? 'An unknown error occurred.';
